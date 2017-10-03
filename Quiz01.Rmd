@@ -18,3 +18,15 @@ s<- select(d, first_name, last_name, gender) %>% arrange(gender)
 s
 ```
 
+#Quiz 2 
+```{r}
+library(dplyr)
+s<- select(d, first_name, last_name, gender, height, weight, zombies_killed)
+q <- filter(s, gender=="Female")
+q
+library(ggplot2)
+g<-ggplot(q, aes(zombies_killed, height))
+g+geom_point(aes(color=height>=65))+labs(title="Number of Zombies Killed versus Height of Females")+labs(x="Number of Zombies Killed", y="Height")
+
+```
+Okay, not sure how to fix the legend, but red dots are girls that are shorter than 65 inches and blue dots are girls who are 65 inches or taller. There are more blue dots, so taller women seem to kill more zombies?
