@@ -30,3 +30,41 @@ g+geom_point(aes(color=height>=65))+labs(title="Number of Zombies Killed versus 
 
 ```
 Okay, not sure how to fix the legend, but red dots are girls that are shorter than 65 inches and blue dots are girls who are 65 inches or taller. There are more blue dots, so taller women seem to kill more zombies?
+
+#Quiz 3
+Relationship between age and years of education (which we're making into a continuous predictor variable)
+```{r}
+library(curl)
+library(dplyr)
+f <- f <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall17/zombies.csv")
+d <- read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(d)
+q <- filter(d, major == "medicine/nursing")
+q
+plot(data = q, age ~ years_of_education)
+m <- lm(data = q, age ~ years_of_education)
+summary(m)
+library(ggplot2)
+g <- ggplot(data = q, aes(x = years_of_education, y = age))
+g <- g + geom_point(aes(color = gender)) #I don't know how to switch them so we're sticking with gender norms :(
+g <- g + geom_smooth(method = "lm", formula = y ~ x) #The gray area around the regression line is the confidence interval right? #UPDATE yes it is, but the ggplot code below (at the bottom) includes the manually drawn confidence intervals like from module 12
+g 
+
+h_hat <- predict(m, newdata = data.frame(years_of_education = q$years_of_education))
+df <- data.frame(cbind(q$years_of_education, q$age, h_hat))
+names(df) <- c("x", "y", "yhat")
+head(df)
+ci <- predict(m, newdata = data.frame(years_of_education = q$years_of_education), interval = "confidence", 
+    level = 0.90) 
+head(ci)
+df <- cbind(df, ci)
+names(df) <- c("x", "y", "yhat", "CIfit", "CIlwr", "CIupr")
+head(df)
+g <- ggplot(data = q, aes(x = years_of_education, y = age))
+g <- g + geom_point(aes(color = gender))
+g <- g + geom_smooth(method = "lm", formula = y ~ x) 
+g <- g + geom_line(data=df, aes(x = x, y = CIlwr), colour = "blue")
+g <- g + geom_line(data=df, aes(x = x, y = CIupr), colour = "blue")
+g
+```
+
